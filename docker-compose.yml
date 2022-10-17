@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    healthcheck:
+      test: /usr/bin/mysql --user=root --password=password --execute "SELECT 1;"
+      interval: 2s
+      timeout: 1s
+      retries: 10
+
+  terragrunt:
+    image: ockawin/v1-app-duplicity:edge-amd64
+    command: tail -f /dev/null
+    volumes: [ ./src:/src ]
+    working_dir: /src
+    depends_on:
+      mysql:
+        condition: service_healthy
